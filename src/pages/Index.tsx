@@ -1,8 +1,9 @@
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { TaxCalculatorForm } from "@/components/TaxCalculatorForm";
 import { TaxSummaryCard } from "@/components/TaxSummaryCard";
+import { TaxBandChart } from "@/components/TaxBandChart";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { ExportButtons } from "@/components/ExportButtons";
 import { Button } from "@/components/ui/button";
@@ -122,6 +123,7 @@ const Index = () => {
             {/* Right Column - Summary & History */}
             <div className="space-y-4">
               <TaxSummaryCard result={taxResult} />
+              <TaxBandChart breakdown={taxResult.bandBreakdown} />
               <ExportButtons
                 result={taxResult}
                 grossSalary={grossSalary}
