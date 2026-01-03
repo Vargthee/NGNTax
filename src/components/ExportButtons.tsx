@@ -1,0 +1,75 @@
+import { Button } from "@/components/ui/button";
+import { TaxResult, formatNaira } from "@/lib/taxUtils";
+import { TAX_CONFIG } from "@/lib/taxConfig";
+import { Printer, Download } from "lucide-react";
+
+interface ExportButtonsProps {
+  result: TaxResult;
+  grossSalary: number;
+  pensionRate: number;
+}
+
+export function ExportButtons({ result, grossSalary, pensionRate }: ExportButtonsProps) {
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleExportCSV = () => {
+    const rows = [
+      ["NGNTax Calculation Summary"],
+      ["Generated", new Date().toLocaleDateString("en-NG")],
+      [""],
+      ["Income Details"],
+      ["Gross Annual Salary", result.grossAnnualIncome.toString()],
+      ["Pension Rate", `${(pensionRate * 100).toFixed(1)}%`],
+      [""],
+      ["Reliefs"],
+      ["Consolidated Relief Allowance (CRA)", result.cra.toString()],
+      ["Pension Contribution", result.pensionContribution.toString()],
+      ["NHF Contribution", result.nhfContribution.toString()],
+      ["Life Insurance", result.lifeInsurance.toString()],
+      ["Total Reliefs", result.totalReliefs.toString()],
+      [""],
+      ["Tax Calculation"],
+      ["Taxable Income", result.taxableIncome.toString()],
+      ["Annual Tax", result.annualTax.toString()],
+      ["Monthly Tax", result.monthlyTax.toString()],
+      ["Effective Tax Rate", `${result.effectiveRate.toFixed(2)}%`],
+      [""],
+      ["Tax Bands Breakdown"],
+      ...result.bandBreakdown.map((band) => [
+        band.band,
+        `${(band.rate * 100).toFixed(0)}%`,
+        band.taxableInBand.toString(),
+        band.taxAmount.toString(),
+      ]),
+      [""],
+      [`Based on Finance Act ${TAX_CONFIG.financeActYear}`],
+    ];
+
+    const csvContent = rows.map((row) => row.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", `ngntax-calculation-${Date.now()}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="flex gap-2 no-print">
+      <Button variant="outline" onClick={handlePrint} className="flex-1">
+        <Printer className="h-4 w-4 mr-2" />
+        Print
+      </Button>
+      <Button variant="outline" onClick={handleExportCSV} className="flex-1">
+        <Download className="h-4 w-4 mr-2" />
+        Export CSV
+      </Button>
+    </div>
+  );
+}
