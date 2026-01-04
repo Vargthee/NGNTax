@@ -7,11 +7,13 @@ export interface HistoryEntry {
   grossSalary: number;
   pensionRate: number;
   nhfContribution: number;
+  nhisContribution: number;
+  annualRent: number;
   lifeInsurance: number;
   result: TaxResult;
 }
 
-const STORAGE_KEY = "ngntax-history";
+const STORAGE_KEY = "ngntax-history-v2"; // Changed key for new format
 const MAX_ENTRIES = 10;
 
 export function useCalculationHistory() {
@@ -37,6 +39,8 @@ export function useCalculationHistory() {
     grossSalary: number,
     pensionRate: number,
     nhfContribution: number,
+    nhisContribution: number,
+    annualRent: number,
     lifeInsurance: number,
     result: TaxResult
   ) => {
@@ -46,6 +50,8 @@ export function useCalculationHistory() {
       grossSalary,
       pensionRate,
       nhfContribution,
+      nhisContribution,
+      annualRent,
       lifeInsurance,
       result,
     };

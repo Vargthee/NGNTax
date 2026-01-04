@@ -21,6 +21,8 @@ const Index = () => {
   const [grossSalary, setGrossSalary] = useState(0);
   const [pensionRate, setPensionRate] = useState<number>(TAX_CONFIG.contributions.pension.defaultRate);
   const [nhfContribution, setNhfContribution] = useState(0);
+  const [nhisContribution, setNhisContribution] = useState(0);
+  const [annualRent, setAnnualRent] = useState(0);
   const [lifeInsurance, setLifeInsurance] = useState(0);
   const [isMonthly, setIsMonthly] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
@@ -31,22 +33,26 @@ const Index = () => {
       grossAnnualSalary: grossSalary,
       pensionRate,
       nhfContribution,
+      nhisContribution,
+      annualRent,
       lifeInsurance,
     });
-  }, [grossSalary, pensionRate, nhfContribution, lifeInsurance]);
+  }, [grossSalary, pensionRate, nhfContribution, nhisContribution, annualRent, lifeInsurance]);
 
   // Save to history
   const handleSaveToHistory = useCallback(() => {
     if (grossSalary > 0) {
-      addEntry(grossSalary, pensionRate, nhfContribution, lifeInsurance, taxResult);
+      addEntry(grossSalary, pensionRate, nhfContribution, nhisContribution, annualRent, lifeInsurance, taxResult);
     }
-  }, [grossSalary, pensionRate, nhfContribution, lifeInsurance, taxResult, addEntry]);
+  }, [grossSalary, pensionRate, nhfContribution, nhisContribution, annualRent, lifeInsurance, taxResult, addEntry]);
 
   // Load from history
   const handleLoadEntry = useCallback((entry: HistoryEntry) => {
     setGrossSalary(entry.grossSalary);
     setPensionRate(entry.pensionRate);
     setNhfContribution(entry.nhfContribution);
+    setNhisContribution(entry.nhisContribution || 0);
+    setAnnualRent(entry.annualRent || 0);
     setLifeInsurance(entry.lifeInsurance);
   }, []);
 
@@ -62,7 +68,7 @@ const Index = () => {
               Nigerian PAYE Tax Calculator
             </h2>
             <p className="text-muted-foreground">
-              Calculate your income tax based on the Finance Act {TAX_CONFIG.financeActYear}
+              Calculate your income tax based on the Nigeria Tax Act {TAX_CONFIG.financeActYear} (Effective {TAX_CONFIG.effectiveDate})
             </p>
           </div>
 
@@ -77,6 +83,10 @@ const Index = () => {
                 setPensionRate={setPensionRate}
                 nhfContribution={nhfContribution}
                 setNhfContribution={setNhfContribution}
+                nhisContribution={nhisContribution}
+                setNhisContribution={setNhisContribution}
+                annualRent={annualRent}
+                setAnnualRent={setAnnualRent}
                 lifeInsurance={lifeInsurance}
                 setLifeInsurance={setLifeInsurance}
                 isMonthly={isMonthly}
