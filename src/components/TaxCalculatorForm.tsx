@@ -4,9 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
 import { TAX_CONFIG } from "@/lib/taxConfig";
 import { formatNaira } from "@/lib/taxUtils";
-
+import { Calculator } from "lucide-react";
 interface TaxCalculatorFormProps {
   grossSalary: number;
   setGrossSalary: (value: number) => void;
@@ -209,9 +210,25 @@ export function TaxCalculatorForm({
 
         {/* NHF Contribution */}
         <div className="space-y-2">
-          <Label htmlFor="nhf">
-            NHF Contribution {isMonthly ? "(Monthly)" : "(Annual)"} - Optional
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="nhf">
+              NHF Contribution {isMonthly ? "(Monthly)" : "(Annual)"}
+            </Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const nhfAmount = grossSalary * 0.025;
+                setNhfContribution(nhfAmount);
+              }}
+              disabled={grossSalary <= 0}
+              className="h-7 text-xs gap-1"
+            >
+              <Calculator className="h-3 w-3" />
+              Auto (2.5%)
+            </Button>
+          </div>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
             <Input
@@ -223,16 +240,34 @@ export function TaxCalculatorForm({
               className="pl-8"
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            Standard: 2.5% of gross salary
-          </p>
+          {grossSalary > 0 && (
+            <p className="text-xs text-muted-foreground">
+              2.5% of gross = {formatNaira(grossSalary * 0.025)}
+            </p>
+          )}
         </div>
 
         {/* NHIS Contribution */}
         <div className="space-y-2">
-          <Label htmlFor="nhis">
-            NHIS Contribution {isMonthly ? "(Monthly)" : "(Annual)"} - Optional
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="nhis">
+              NHIS Contribution {isMonthly ? "(Monthly)" : "(Annual)"}
+            </Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const nhisAmount = grossSalary * 0.05;
+                setNhisContribution(nhisAmount);
+              }}
+              disabled={grossSalary <= 0}
+              className="h-7 text-xs gap-1"
+            >
+              <Calculator className="h-3 w-3" />
+              Auto (5%)
+            </Button>
+          </div>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
             <Input
@@ -244,9 +279,11 @@ export function TaxCalculatorForm({
               className="pl-8"
             />
           </div>
-          <p className="text-xs text-muted-foreground">
-            Employee: 5% of basic salary (for employers with 10+ employees)
-          </p>
+          {grossSalary > 0 && (
+            <p className="text-xs text-muted-foreground">
+              5% of gross = {formatNaira(grossSalary * 0.05)}
+            </p>
+          )}
         </div>
 
         {/* Annual Rent */}
