@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TaxResult, formatNaira, formatPercent } from "@/lib/taxUtils";
-import { TrendingDown, Wallet, Receipt, PiggyBank } from "lucide-react";
+import { TrendingDown, Wallet, Receipt, PiggyBank, Home } from "lucide-react";
 
 interface TaxSummaryCardProps {
   result: TaxResult;
@@ -13,7 +13,7 @@ export function TaxSummaryCard({ result }: TaxSummaryCardProps) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <Receipt className="h-5 w-5 text-primary" />
-          Tax Summary
+          Tax Summary (2026 Tax Law)
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -28,17 +28,13 @@ export function TaxSummaryCard({ result }: TaxSummaryCardProps) {
 
         <Separator />
 
-        {/* Reliefs Breakdown */}
+        {/* Deductions Breakdown */}
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-sm font-medium">
             <TrendingDown className="h-4 w-4 text-primary" />
-            <span>Total Reliefs</span>
+            <span>Allowable Deductions</span>
           </div>
           <div className="ml-6 space-y-1 text-sm">
-            <div className="flex justify-between text-muted-foreground">
-              <span>CRA (Consolidated Relief)</span>
-              <span>{formatNaira(result.cra)}</span>
-            </div>
             <div className="flex justify-between text-muted-foreground">
               <span>Pension Contribution</span>
               <span>{formatNaira(result.pensionContribution)}</span>
@@ -49,6 +45,21 @@ export function TaxSummaryCard({ result }: TaxSummaryCardProps) {
                 <span>{formatNaira(result.nhfContribution)}</span>
               </div>
             )}
+            {result.nhisContribution > 0 && (
+              <div className="flex justify-between text-muted-foreground">
+                <span>NHIS Contribution</span>
+                <span>{formatNaira(result.nhisContribution)}</span>
+              </div>
+            )}
+            {result.rentRelief > 0 && (
+              <div className="flex justify-between text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Home className="h-3 w-3" />
+                  <span>Rent Relief</span>
+                </div>
+                <span>{formatNaira(result.rentRelief)}</span>
+              </div>
+            )}
             {result.lifeInsurance > 0 && (
               <div className="flex justify-between text-muted-foreground">
                 <span>Life Insurance</span>
@@ -56,8 +67,8 @@ export function TaxSummaryCard({ result }: TaxSummaryCardProps) {
               </div>
             )}
             <div className="flex justify-between font-medium pt-1 border-t border-dashed">
-              <span>Total</span>
-              <span className="text-primary">{formatNaira(result.totalReliefs)}</span>
+              <span>Total Deductions</span>
+              <span className="text-primary">{formatNaira(result.totalDeductions)}</span>
             </div>
           </div>
         </div>
@@ -90,6 +101,18 @@ export function TaxSummaryCard({ result }: TaxSummaryCardProps) {
           </div>
           <div className="text-center text-sm text-muted-foreground">
             Effective Tax Rate: <span className="font-medium text-foreground">{formatPercent(result.effectiveRate)}</span>
+          </div>
+        </div>
+
+        {/* Net Income */}
+        <div className="rounded-lg bg-green-500/10 p-4 space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Net Annual Income</span>
+            <span className="font-bold text-green-600 dark:text-green-400">{formatNaira(result.netAnnualIncome)}</span>
+          </div>
+          <div className="flex items-center justify-between text-muted-foreground">
+            <span className="text-xs">Net Monthly Income</span>
+            <span className="text-sm font-medium">{formatNaira(result.netMonthlyIncome)}</span>
           </div>
         </div>
 

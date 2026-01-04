@@ -1,17 +1,24 @@
 /**
- * Nigerian Tax Calculation Utilities
- * ==================================
+ * Nigerian Tax Calculation Utilities - Nigeria Tax Act 2025
+ * ==========================================================
  * 
  * Pure functions for calculating Nigerian PAYE tax.
  * All business logic is contained here for easy testing.
+ * 
+ * Key changes from 2024:
+ * - CRA is abolished (no more 200k + 20% formula)
+ * - New tax bands starting with 0% for first ₦800,000
+ * - Allowable deductions: Pension, NHF, NHIS, Rent Relief, Life Insurance
  */
 
 import { TAX_CONFIG } from "./taxConfig";
 
 export interface TaxInput {
   grossAnnualSalary: number;
-  pensionRate: number; // As decimal (e.g., 0.075 for 7.5%)
+  pensionRate: number; // As decimal (e.g., 0.08 for 8%)
   nhfContribution: number; // Absolute amount
+  nhisContribution: number; // Absolute amount (new)
+  annualRent: number; // Annual rent paid (new - for rent relief calculation)
   lifeInsurance: number; // Absolute amount
 }
 
@@ -26,14 +33,17 @@ export interface TaxResult {
   grossAnnualIncome: number;
   pensionContribution: number;
   nhfContribution: number;
+  nhisContribution: number;
+  rentRelief: number;
   lifeInsurance: number;
-  cra: number;
-  totalReliefs: number;
+  totalDeductions: number;
   taxableIncome: number;
   annualTax: number;
   monthlyTax: number;
   effectiveRate: number;
   bandBreakdown: TaxBandBreakdown[];
+  netAnnualIncome: number;
+  netMonthlyIncome: number;
 }
 
 /**
@@ -47,46 +57,63 @@ export function calculatePensionContribution(
 }
 
 /**
- * Calculate Consolidated Relief Allowance (CRA)
- * CRA = Higher of (₦200,000 or 1% of Gross) + 20% of Gross Income
+ * Calculate NHF contribution (2.5% of gross if enabled)
  */
-export function calculateCRA(grossAnnualIncome: number): number {
-  const { fixedFloor, percentOfGross, additionalPercent } = TAX_CONFIG.cra;
-  
-  // Higher of ₦200,000 or 1% of gross
-  const baseRelief = Math.max(fixedFloor, grossAnnualIncome * percentOfGross);
-  
-  // Plus 20% of gross income
-  const additionalRelief = grossAnnualIncome * additionalPercent;
-  
-  return baseRelief + additionalRelief;
+export function calculateNHFContribution(grossAnnualSalary: number): number {
+  return grossAnnualSalary * TAX_CONFIG.contributions.nhf.defaultRate;
 }
 
 /**
- * Calculate total reliefs (CRA + Pension + NHF + Life Insurance)
+ * Calculate Rent Relief
+ * 20% of annual rent, capped at ₦500,000
  */
-export function calculateTotalReliefs(
-  cra: number,
+export function calculateRentRelief(annualRent: number): number {
+  const { percentOfRent, maxAmount } = TAX_CONFIG.rentRelief;
+  const calculatedRelief = annualRent * percentOfRent;
+  return Math.min(calculatedRelief, maxAmount);
+}
+
+/**
+ * Calculate total allowable deductions
+ * Under Nigeria Tax Act 2025, the eligible deductions are:
+ * 1. Pension contribution
+ * 2. NHF contribution
+ * 3. NHIS contribution
+ * 4. Rent relief (20% of rent, max ₦500k)
+ * 5. Life insurance premium
+ * (Mortgage interest excluded as it requires separate documentation)
+ */
+export function calculateTotalDeductions(
   pensionContribution: number,
   nhfContribution: number,
+  nhisContribution: number,
+  rentRelief: number,
   lifeInsurance: number
 ): number {
-  return cra + pensionContribution + nhfContribution + lifeInsurance;
+  return pensionContribution + nhfContribution + nhisContribution + rentRelief + lifeInsurance;
 }
 
 /**
- * Calculate taxable income (Gross - Total Reliefs)
+ * Calculate taxable income (Gross - Total Deductions)
  */
 export function calculateTaxableIncome(
   grossAnnualIncome: number,
-  totalReliefs: number
+  totalDeductions: number
 ): number {
-  return Math.max(0, grossAnnualIncome - totalReliefs);
+  return Math.max(0, grossAnnualIncome - totalDeductions);
 }
 
 /**
- * Calculate PAYE tax using progressive tax bands
+ * Calculate PAYE tax using new progressive tax bands (Nigeria Tax Act 2025)
  * Returns the tax amount and breakdown by band
+ * 
+ * Bands:
+ * - ₦0 - ₦800,000: 0%
+ * - ₦800,001 - ₦3,000,000: 15%
+ * - ₦3,000,001 - ₦12,000,000: 18%
+ * - ₦12,000,001 - ₦25,000,000: 21%
+ * - ₦25,000,001 - ₦50,000,000: 23%
+ * - Above ₦50,000,000: 25%
  */
 export function calculatePAYE(taxableIncome: number): {
   tax: number;
@@ -119,59 +146,63 @@ export function calculatePAYE(taxableIncome: number): {
 }
 
 /**
- * Calculate minimum tax (1% of gross income)
- * Applied if calculated tax is less than minimum tax
- */
-export function calculateMinimumTax(grossAnnualIncome: number): number {
-  return grossAnnualIncome * TAX_CONFIG.minimumTaxRate;
-}
-
-/**
  * Main calculation function - calculates complete tax breakdown
+ * Based on Nigeria Tax Act 2025 (effective January 1, 2026)
  */
 export function calculateTax(input: TaxInput): TaxResult {
-  const { grossAnnualSalary, pensionRate, nhfContribution, lifeInsurance } = input;
+  const { 
+    grossAnnualSalary, 
+    pensionRate, 
+    nhfContribution, 
+    nhisContribution,
+    annualRent,
+    lifeInsurance 
+  } = input;
 
   // Calculate pension
   const pensionContribution = calculatePensionContribution(grossAnnualSalary, pensionRate);
 
-  // Calculate CRA
-  const cra = calculateCRA(grossAnnualSalary);
+  // Calculate rent relief (20% of rent, max ₦500k)
+  const rentRelief = calculateRentRelief(annualRent);
 
-  // Calculate total reliefs
-  const totalReliefs = calculateTotalReliefs(
-    cra,
+  // Calculate total deductions
+  const totalDeductions = calculateTotalDeductions(
     pensionContribution,
     nhfContribution,
+    nhisContribution,
+    rentRelief,
     lifeInsurance
   );
 
   // Calculate taxable income
-  const taxableIncome = calculateTaxableIncome(grossAnnualSalary, totalReliefs);
+  const taxableIncome = calculateTaxableIncome(grossAnnualSalary, totalDeductions);
 
-  // Calculate PAYE
-  const { tax: payeTax, breakdown } = calculatePAYE(taxableIncome);
-
-  // Apply minimum tax rule
-  const minimumTax = calculateMinimumTax(grossAnnualSalary);
-  const annualTax = Math.max(payeTax, minimumTax);
+  // Calculate PAYE using new bands
+  const { tax: annualTax, breakdown } = calculatePAYE(taxableIncome);
 
   // Calculate monthly and effective rate
   const monthlyTax = annualTax / 12;
   const effectiveRate = grossAnnualSalary > 0 ? (annualTax / grossAnnualSalary) * 100 : 0;
 
+  // Calculate net income
+  const netAnnualIncome = grossAnnualSalary - pensionContribution - nhfContribution - nhisContribution - annualTax;
+  const netMonthlyIncome = netAnnualIncome / 12;
+
   return {
     grossAnnualIncome: grossAnnualSalary,
     pensionContribution,
     nhfContribution,
+    nhisContribution,
+    rentRelief,
     lifeInsurance,
-    cra,
-    totalReliefs,
+    totalDeductions,
     taxableIncome,
     annualTax,
     monthlyTax,
     effectiveRate,
     bandBreakdown: breakdown,
+    netAnnualIncome,
+    netMonthlyIncome,
   };
 }
 

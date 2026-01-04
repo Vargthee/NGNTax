@@ -1,32 +1,29 @@
 /**
- * Nigerian Tax Configuration
- * =========================
+ * Nigerian Tax Configuration - Nigeria Tax Act 2025
+ * ==================================================
  * 
  * This file contains all tax rules and rates as a single source of truth.
  * When the government changes any tax law, update ONLY this file.
  * 
- * Last updated: Finance Act 2024
+ * Last updated: Nigeria Tax Act 2025 (Effective January 1, 2026)
+ * 
+ * Key Changes from 2024:
+ * - CRA (Consolidated Relief Allowance) is ABOLISHED
+ * - New progressive tax bands with 0% for first ₦800,000
+ * - Pension contribution rate changed to 8%
+ * - New Rent Relief: 20% of annual rent, capped at ₦500,000
  */
 
 export const TAX_CONFIG = {
   // Reference year for disclaimer
-  financeActYear: 2024,
+  financeActYear: 2025,
+  effectiveDate: "January 1, 2026",
   verifiedBy: "[Placeholder Name]",
-
-  // Consolidated Relief Allowance (CRA) parameters
-  cra: {
-    // Fixed floor amount (₦200,000 or 1% of gross, whichever is higher)
-    fixedFloor: 200_000,
-    // Percentage of gross income (alternative to fixed floor)
-    percentOfGross: 0.01, // 1%
-    // Additional relief as percentage of gross income
-    additionalPercent: 0.20, // 20%
-  },
 
   // Default contribution rates
   contributions: {
     pension: {
-      defaultRate: 0.075, // 7.5%
+      defaultRate: 0.08, // 8% (updated from 7.5%)
       minRate: 0,
       maxRate: 0.20, // 20% max
     },
@@ -35,19 +32,28 @@ export const TAX_CONFIG = {
     },
   },
 
-  // PAYE Tax Bands (Progressive tax rates)
-  // Each band: { threshold: amount up to which this rate applies, rate: tax rate }
+  // Rent Relief parameters
+  rentRelief: {
+    percentOfRent: 0.20, // 20% of annual rent
+    maxAmount: 500_000, // Capped at ₦500,000
+  },
+
+  // PAYE Tax Bands (Progressive tax rates) - Nigeria Tax Act 2025
+  // Each band: { threshold: amount for this band, rate: tax rate, cumulative: cumulative threshold }
   taxBands: [
-    { threshold: 300_000, rate: 0.07, label: "First ₦300,000" },
-    { threshold: 300_000, rate: 0.11, label: "Next ₦300,000" },
-    { threshold: 500_000, rate: 0.15, label: "Next ₦500,000" },
-    { threshold: 500_000, rate: 0.19, label: "Next ₦500,000" },
-    { threshold: 1_600_000, rate: 0.21, label: "Next ₦1,600,000" },
-    { threshold: Infinity, rate: 0.24, label: "Above ₦3,200,000" },
+    { threshold: 800_000, rate: 0.00, label: "First ₦800,000", cumulative: 800_000 },
+    { threshold: 2_200_000, rate: 0.15, label: "Next ₦2,200,000", cumulative: 3_000_000 },
+    { threshold: 9_000_000, rate: 0.18, label: "Next ₦9,000,000", cumulative: 12_000_000 },
+    { threshold: 13_000_000, rate: 0.21, label: "Next ₦13,000,000", cumulative: 25_000_000 },
+    { threshold: 25_000_000, rate: 0.23, label: "Next ₦25,000,000", cumulative: 50_000_000 },
+    { threshold: Infinity, rate: 0.25, label: "Above ₦50,000,000", cumulative: Infinity },
   ],
 
-  // Minimum tax rate (1% of gross income if taxable income is negligible)
-  minimumTaxRate: 0.01,
+  // Minimum wage exemption (national minimum wage earners are tax-exempt)
+  minimumWageAnnual: 420_000, // ₦35,000/month × 12
+
+  // Employment compensation exemption limit
+  compensationExemptionLimit: 50_000_000,
 } as const;
 
 export type TaxConfig = typeof TAX_CONFIG;

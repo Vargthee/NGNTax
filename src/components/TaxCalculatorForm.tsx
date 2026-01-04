@@ -14,6 +14,10 @@ interface TaxCalculatorFormProps {
   setPensionRate: (value: number) => void;
   nhfContribution: number;
   setNhfContribution: (value: number) => void;
+  nhisContribution: number;
+  setNhisContribution: (value: number) => void;
+  annualRent: number;
+  setAnnualRent: (value: number) => void;
   lifeInsurance: number;
   setLifeInsurance: (value: number) => void;
   isMonthly: boolean;
@@ -27,6 +31,10 @@ export function TaxCalculatorForm({
   setPensionRate,
   nhfContribution,
   setNhfContribution,
+  nhisContribution,
+  setNhisContribution,
+  annualRent,
+  setAnnualRent,
   lifeInsurance,
   setLifeInsurance,
   isMonthly,
@@ -34,6 +42,8 @@ export function TaxCalculatorForm({
 }: TaxCalculatorFormProps) {
   const [salaryInput, setSalaryInput] = useState("");
   const [nhfInput, setNhfInput] = useState("");
+  const [nhisInput, setNhisInput] = useState("");
+  const [rentInput, setRentInput] = useState("");
   const [insuranceInput, setInsuranceInput] = useState("");
 
   // Sync input fields when values change externally (e.g., from history)
@@ -54,6 +64,24 @@ export function TaxCalculatorForm({
       setNhfInput("");
     }
   }, [nhfContribution, isMonthly]);
+
+  useEffect(() => {
+    const displayValue = isMonthly ? nhisContribution / 12 : nhisContribution;
+    if (displayValue > 0) {
+      setNhisInput(displayValue.toLocaleString("en-NG"));
+    } else {
+      setNhisInput("");
+    }
+  }, [nhisContribution, isMonthly]);
+
+  useEffect(() => {
+    // Rent is always annual
+    if (annualRent > 0) {
+      setRentInput(annualRent.toLocaleString("en-NG"));
+    } else {
+      setRentInput("");
+    }
+  }, [annualRent]);
 
   useEffect(() => {
     const displayValue = isMonthly ? lifeInsurance / 12 : lifeInsurance;
@@ -78,6 +106,20 @@ export function TaxCalculatorForm({
     setNhfContribution(annualValue);
   };
 
+  const handleNhisChange = (value: string) => {
+    setNhisInput(value);
+    const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    const annualValue = isMonthly ? numValue * 12 : numValue;
+    setNhisContribution(annualValue);
+  };
+
+  const handleRentChange = (value: string) => {
+    setRentInput(value);
+    const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    // Rent is always entered as annual
+    setAnnualRent(numValue);
+  };
+
   const handleInsuranceChange = (value: string) => {
     setInsuranceInput(value);
     const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
@@ -89,13 +131,19 @@ export function TaxCalculatorForm({
     setIsMonthly(checked);
   };
 
+  // Calculate rent relief preview
+  const rentReliefPreview = Math.min(
+    annualRent * TAX_CONFIG.rentRelief.percentOfRent,
+    TAX_CONFIG.rentRelief.maxAmount
+  );
+
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Income Details</CardTitle>
-            <CardDescription>Enter your salary and deductions</CardDescription>
+            <CardDescription>Enter your salary and deductions (2026 Tax Law)</CardDescription>
           </div>
           <div className="flex items-center gap-2">
             <Label htmlFor="mode-toggle" className="text-sm text-muted-foreground">
@@ -175,6 +223,53 @@ export function TaxCalculatorForm({
               className="pl-8"
             />
           </div>
+          <p className="text-xs text-muted-foreground">
+            Standard: 2.5% of gross salary
+          </p>
+        </div>
+
+        {/* NHIS Contribution */}
+        <div className="space-y-2">
+          <Label htmlFor="nhis">
+            NHIS Contribution {isMonthly ? "(Monthly)" : "(Annual)"} - Optional
+          </Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
+            <Input
+              id="nhis"
+              type="text"
+              placeholder="0"
+              value={nhisInput}
+              onChange={(e) => handleNhisChange(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Employee: 5% of basic salary (for employers with 10+ employees)
+          </p>
+        </div>
+
+        {/* Annual Rent */}
+        <div className="space-y-2">
+          <Label htmlFor="annual-rent">
+            Annual Rent Paid (₦) - For Rent Relief
+          </Label>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
+            <Input
+              id="annual-rent"
+              type="text"
+              placeholder="0"
+              value={rentInput}
+              onChange={(e) => handleRentChange(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          {annualRent > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Rent Relief: {formatNaira(rentReliefPreview)} (20% of rent, max ₦500,000)
+            </p>
+          )}
         </div>
 
         {/* Life Insurance */}

@@ -9,7 +9,7 @@ export function Footer() {
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Shield className="h-4 w-4" />
             <span>
-              Calculations based on Finance Act {TAX_CONFIG.financeActYear}. Verified by {TAX_CONFIG.verifiedBy}.
+              Calculations based on Nigeria Tax Act {TAX_CONFIG.financeActYear} (Effective {TAX_CONFIG.effectiveDate}). Verified by {TAX_CONFIG.verifiedBy}.
             </span>
           </div>
           <p className="text-xs text-muted-foreground">
