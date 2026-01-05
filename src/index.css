@@ -2,95 +2,104 @@
 @tailwind components;
 @tailwind utilities;
 
-/* NGNTax Design System - Deep Green & White Theme
+/* NGNTax Design System - "Calm Utility" Theme
+   Inspired by Notion, Linear, Wise - clean, intentional, anxiety-reducing
    All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 150 30% 10%;
+    /* Warm neutral base - not stark white */
+    --background: 40 20% 98%;
+    --foreground: 220 15% 18%;
 
+    /* Subtle off-white cards */
     --card: 0 0% 100%;
-    --card-foreground: 150 30% 10%;
+    --card-foreground: 220 15% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 30% 10%;
+    --popover-foreground: 220 15% 18%;
 
-    --primary: 150 60% 25%;
+    /* Muted teal/green - calming, trustworthy */
+    --primary: 160 45% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 150 20% 94%;
-    --secondary-foreground: 150 40% 20%;
+    /* Soft warm gray */
+    --secondary: 40 8% 95%;
+    --secondary-foreground: 220 12% 35%;
 
-    --muted: 150 15% 95%;
-    --muted-foreground: 150 10% 45%;
+    --muted: 40 10% 96%;
+    --muted-foreground: 220 8% 50%;
 
-    --accent: 150 35% 90%;
-    --accent-foreground: 150 50% 20%;
+    --accent: 160 25% 94%;
+    --accent-foreground: 160 40% 28%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 65% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 150 15% 88%;
-    --input: 150 15% 88%;
-    --ring: 150 60% 25%;
+    /* Subtle borders - almost invisible */
+    --border: 220 10% 90%;
+    --input: 220 10% 92%;
+    --ring: 160 45% 35%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    --success: 150 60% 35%;
+    --success: 145 50% 42%;
     --success-foreground: 0 0% 100%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 150 30% 10%;
-    --sidebar-primary: 150 60% 25%;
+    /* Sidebar tokens */
+    --sidebar-background: 40 15% 97%;
+    --sidebar-foreground: 220 15% 18%;
+    --sidebar-primary: 160 45% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 150 35% 90%;
-    --sidebar-accent-foreground: 150 50% 20%;
-    --sidebar-border: 150 15% 88%;
-    --sidebar-ring: 150 60% 25%;
+    --sidebar-accent: 160 20% 94%;
+    --sidebar-accent-foreground: 160 35% 28%;
+    --sidebar-border: 220 10% 92%;
+    --sidebar-ring: 160 45% 35%;
   }
 
   .dark {
-    --background: 150 25% 8%;
-    --foreground: 150 10% 95%;
+    /* Deep warm dark - not pure black */
+    --background: 220 20% 10%;
+    --foreground: 40 10% 92%;
 
-    --card: 150 20% 12%;
-    --card-foreground: 150 10% 95%;
+    --card: 220 18% 13%;
+    --card-foreground: 40 10% 92%;
 
-    --popover: 150 20% 12%;
-    --popover-foreground: 150 10% 95%;
+    --popover: 220 18% 13%;
+    --popover-foreground: 40 10% 92%;
 
-    --primary: 150 55% 45%;
-    --primary-foreground: 150 30% 8%;
+    /* Brighter teal for dark mode */
+    --primary: 160 55% 50%;
+    --primary-foreground: 220 20% 10%;
 
-    --secondary: 150 15% 18%;
-    --secondary-foreground: 150 10% 90%;
+    --secondary: 220 15% 18%;
+    --secondary-foreground: 40 8% 85%;
 
-    --muted: 150 15% 18%;
-    --muted-foreground: 150 10% 60%;
+    --muted: 220 12% 18%;
+    --muted-foreground: 40 8% 55%;
 
-    --accent: 150 20% 22%;
-    --accent-foreground: 150 10% 95%;
+    --accent: 160 20% 18%;
+    --accent-foreground: 160 40% 75%;
 
-    --destructive: 0 62% 50%;
+    --destructive: 0 55% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 150 15% 20%;
-    --input: 150 15% 20%;
-    --ring: 150 55% 45%;
+    --border: 220 12% 20%;
+    --input: 220 12% 20%;
+    --ring: 160 55% 50%;
 
-    --success: 150 50% 40%;
+    --success: 145 45% 48%;
     --success-foreground: 0 0% 100%;
 
-    --sidebar-background: 150 20% 10%;
-    --sidebar-foreground: 150 10% 95%;
-    --sidebar-primary: 150 55% 45%;
-    --sidebar-primary-foreground: 150 30% 8%;
-    --sidebar-accent: 150 20% 18%;
-    --sidebar-accent-foreground: 150 10% 95%;
-    --sidebar-border: 150 15% 20%;
-    --sidebar-ring: 150 55% 45%;
+    --sidebar-background: 220 18% 11%;
+    --sidebar-foreground: 40 10% 92%;
+    --sidebar-primary: 160 55% 50%;
+    --sidebar-primary-foreground: 220 20% 10%;
+    --sidebar-accent: 160 15% 18%;
+    --sidebar-accent-foreground: 160 35% 75%;
+    --sidebar-border: 220 12% 20%;
+    --sidebar-ring: 160 55% 50%;
   }
 }
 
@@ -99,8 +108,22 @@
     @apply border-border;
   }
 
+  html {
+    @apply scroll-smooth;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Typography refinements */
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }
 
@@ -117,5 +140,12 @@
   
   .print-only {
     display: block !important;
+  }
+}
+
+/* Subtle focus states - not jarring */
+@layer base {
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary/30 ring-offset-2 ring-offset-background;
   }
 }
