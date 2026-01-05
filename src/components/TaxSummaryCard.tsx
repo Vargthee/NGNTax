@@ -13,7 +13,7 @@ export function TaxSummaryCard({ result }: TaxSummaryCardProps) {
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2">
           <Receipt className="h-5 w-5 text-primary" />
-          Tax Summary (2026 Tax Law)
+          Tax Summary 
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
