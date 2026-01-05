@@ -1,141 +1,125 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { TaxResult, formatNaira, formatPercent } from "@/lib/taxUtils";
-import { TrendingDown, Wallet, Receipt, PiggyBank, Home } from "lucide-react";
 
 interface TaxSummaryCardProps {
   result: TaxResult;
 }
 
 export function TaxSummaryCard({ result }: TaxSummaryCardProps) {
+  const hasDeductions = result.totalDeductions > 0;
+
   return (
-    <Card className="border-primary/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2">
-          <Receipt className="h-5 w-5 text-primary" />
-          Tax Summary (2026 Tax Law)
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {/* Gross Income */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Gross Annual Income</span>
-          </div>
-          <span className="font-semibold">{formatNaira(result.grossAnnualIncome)}</span>
+    <div className="rounded-lg border border-border/50 bg-card p-5 md:p-6 space-y-6">
+      {/* Header */}
+      <div>
+        <h2 className="text-sm font-medium text-muted-foreground mb-1">Tax Summary</h2>
+        <p className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground tabular-nums">
+          {formatNaira(result.annualTax)}
+          <span className="text-sm font-normal text-muted-foreground ml-1">/year</span>
+        </p>
+      </div>
+
+      {/* Key Figures */}
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Monthly tax</p>
+          <p className="text-lg font-medium tabular-nums">{formatNaira(result.monthlyTax)}</p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-xs text-muted-foreground">Effective rate</p>
+          <p className="text-lg font-medium tabular-nums">{formatPercent(result.effectiveRate)}</p>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="h-px bg-border/50" />
+
+      {/* Breakdown */}
+      <div className="space-y-3">
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Gross income</span>
+          <span className="tabular-nums">{formatNaira(result.grossAnnualIncome)}</span>
         </div>
 
-        <Separator />
-
-        {/* Deductions Breakdown */}
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-sm font-medium">
-            <TrendingDown className="h-4 w-4 text-primary" />
-            <span>Allowable Deductions</span>
-          </div>
-          <div className="ml-6 space-y-1 text-sm">
-            <div className="flex justify-between text-muted-foreground">
-              <span>Pension Contribution</span>
-              <span>{formatNaira(result.pensionContribution)}</span>
-            </div>
-            {result.nhfContribution > 0 && (
-              <div className="flex justify-between text-muted-foreground">
-                <span>NHF Contribution</span>
-                <span>{formatNaira(result.nhfContribution)}</span>
-              </div>
-            )}
-            {result.nhisContribution > 0 && (
-              <div className="flex justify-between text-muted-foreground">
-                <span>NHIS Contribution</span>
-                <span>{formatNaira(result.nhisContribution)}</span>
-              </div>
-            )}
-            {result.rentRelief > 0 && (
-              <div className="flex justify-between text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Home className="h-3 w-3" />
-                  <span>Rent Relief</span>
-                </div>
-                <span>{formatNaira(result.rentRelief)}</span>
-              </div>
-            )}
-            {result.lifeInsurance > 0 && (
-              <div className="flex justify-between text-muted-foreground">
-                <span>Life Insurance</span>
-                <span>{formatNaira(result.lifeInsurance)}</span>
-              </div>
-            )}
-            <div className="flex justify-between font-medium pt-1 border-t border-dashed">
-              <span>Total Deductions</span>
-              <span className="text-primary">{formatNaira(result.totalDeductions)}</span>
-            </div>
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Taxable Income */}
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Taxable Income</span>
-          <span className="font-semibold">{formatNaira(result.taxableIncome)}</span>
-        </div>
-
-        <Separator />
-
-        {/* Tax Payable */}
-        <div className="rounded-lg bg-primary/10 p-4 space-y-3">
-          <div className="flex items-center gap-2">
-            <PiggyBank className="h-5 w-5 text-primary" />
-            <span className="font-semibold">Tax Payable</span>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="text-center p-3 rounded-md bg-background">
-              <p className="text-xs text-muted-foreground mb-1">Monthly</p>
-              <p className="text-lg font-bold text-primary">{formatNaira(result.monthlyTax)}</p>
-            </div>
-            <div className="text-center p-3 rounded-md bg-background">
-              <p className="text-xs text-muted-foreground mb-1">Yearly</p>
-              <p className="text-lg font-bold text-primary">{formatNaira(result.annualTax)}</p>
-            </div>
-          </div>
-          <div className="text-center text-sm text-muted-foreground">
-            Effective Tax Rate: <span className="font-medium text-foreground">{formatPercent(result.effectiveRate)}</span>
-          </div>
-        </div>
-
-        {/* Net Income */}
-        <div className="rounded-lg bg-green-500/10 p-4 space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Net Annual Income</span>
-            <span className="font-bold text-green-600 dark:text-green-400">{formatNaira(result.netAnnualIncome)}</span>
-          </div>
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs">Net Monthly Income</span>
-            <span className="text-sm font-medium">{formatNaira(result.netMonthlyIncome)}</span>
-          </div>
-        </div>
-
-        {/* Tax Bands Breakdown */}
-        {result.bandBreakdown.length > 0 && (
+        {hasDeductions && (
           <>
-            <Separator />
-            <div className="space-y-2">
-              <p className="text-sm font-medium">Tax Band Breakdown</p>
-              <div className="space-y-1">
-                {result.bandBreakdown.map((band, index) => (
-                  <div key={index} className="flex justify-between text-xs">
-                    <span className="text-muted-foreground">
-                      {band.band} @ {(band.rate * 100).toFixed(0)}%
-                    </span>
-                    <span>{formatNaira(band.taxAmount)}</span>
-                  </div>
-                ))}
-              </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Deductions</span>
+              <span className="tabular-nums text-muted-foreground">−{formatNaira(result.totalDeductions)}</span>
+            </div>
+
+            {/* Deduction details - collapsible feel */}
+            <div className="pl-3 border-l-2 border-border/50 space-y-1.5 text-xs">
+              {result.pensionContribution > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Pension</span>
+                  <span className="tabular-nums">{formatNaira(result.pensionContribution)}</span>
+                </div>
+              )}
+              {result.nhfContribution > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>NHF</span>
+                  <span className="tabular-nums">{formatNaira(result.nhfContribution)}</span>
+                </div>
+              )}
+              {result.nhisContribution > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>NHIS</span>
+                  <span className="tabular-nums">{formatNaira(result.nhisContribution)}</span>
+                </div>
+              )}
+              {result.rentRelief > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Rent relief</span>
+                  <span className="tabular-nums">{formatNaira(result.rentRelief)}</span>
+                </div>
+              )}
+              {result.lifeInsurance > 0 && (
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Life insurance</span>
+                  <span className="tabular-nums">{formatNaira(result.lifeInsurance)}</span>
+                </div>
+              )}
             </div>
           </>
         )}
-      </CardContent>
-    </Card>
+
+        <div className="flex justify-between text-sm pt-2 border-t border-dashed border-border/50">
+          <span className="text-muted-foreground">Taxable income</span>
+          <span className="font-medium tabular-nums">{formatNaira(result.taxableIncome)}</span>
+        </div>
+      </div>
+
+      {/* Divider */}
+      <div className="h-px bg-border/50" />
+
+      {/* Net Income - Highlighted */}
+      <div className="rounded-md bg-accent/50 p-4 space-y-3">
+        <div className="flex justify-between items-baseline">
+          <span className="text-sm font-medium">Net annual income</span>
+          <span className="text-xl font-semibold text-primary tabular-nums">
+            {formatNaira(result.netAnnualIncome)}
+          </span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-muted-foreground">Net monthly</span>
+          <span className="tabular-nums">{formatNaira(result.netMonthlyIncome)}</span>
+        </div>
+      </div>
+
+      {/* Tax Bands - Subtle */}
+      {result.bandBreakdown.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs font-medium text-muted-foreground">Tax bands applied</p>
+          <div className="space-y-1">
+            {result.bandBreakdown.map((band, index) => (
+              <div key={index} className="flex justify-between text-xs text-muted-foreground">
+                <span>{(band.rate * 100).toFixed(0)}% band</span>
+                <span className="tabular-nums">{formatNaira(band.taxAmount)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
