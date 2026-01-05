@@ -121,7 +121,7 @@ Please read `CONTRIBUTING.md` before submitting a pull request.
 
 ## ⚠️ Disclaimer
 
-This software is provided for **educational and estimation purposes only**. While every effort has been made to align with the Finance Act 2026, it does not constitute professional financial advice. Users should verify final tax liabilities with the FIRS or a chartered tax consultant.
+This software is provided for **educational and estimation purposes only**. While every effort has been made to align with the Finance Act of 2025, it does not constitute professional financial advice. Users should verify final tax liabilities with the FIRS or a chartered tax consultant.
 
 ---
 
