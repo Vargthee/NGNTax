@@ -7,7 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { TAX_CONFIG } from "@/lib/taxConfig";
 import { formatNaira } from "@/lib/taxUtils";
-import { Calculator } from "lucide-react";
+import { Calculator, RotateCcw } from "lucide-react";
 interface TaxCalculatorFormProps {
   grossSalary: number;
   setGrossSalary: (value: number) => void;
@@ -132,6 +132,20 @@ export function TaxCalculatorForm({
     setIsMonthly(checked);
   };
 
+  const handleClearAll = () => {
+    setGrossSalary(0);
+    setPensionRate(TAX_CONFIG.contributions.pension.defaultRate);
+    setNhfContribution(0);
+    setNhisContribution(0);
+    setAnnualRent(0);
+    setLifeInsurance(0);
+    setSalaryInput("");
+    setNhfInput("");
+    setNhisInput("");
+    setRentInput("");
+    setInsuranceInput("");
+  };
+
   // Calculate rent relief preview
   const rentReliefPreview = Math.min(
     annualRent * TAX_CONFIG.rentRelief.percentOfRent,
@@ -141,23 +155,35 @@ export function TaxCalculatorForm({
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Income Details</CardTitle>
             <CardDescription>Enter your salary and deductions (2026 Tax Law)</CardDescription>
           </div>
-          <div className="flex items-center gap-2">
-            <Label htmlFor="mode-toggle" className="text-sm text-muted-foreground">
-              Yearly
-            </Label>
-            <Switch
-              id="mode-toggle"
-              checked={isMonthly}
-              onCheckedChange={handleToggleMode}
-            />
-            <Label htmlFor="mode-toggle" className="text-sm text-muted-foreground">
-              Monthly
-            </Label>
+          <div className="flex items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="mode-toggle" className="text-xs sm:text-sm text-muted-foreground">
+                Yearly
+              </Label>
+              <Switch
+                id="mode-toggle"
+                checked={isMonthly}
+                onCheckedChange={handleToggleMode}
+              />
+              <Label htmlFor="mode-toggle" className="text-xs sm:text-sm text-muted-foreground">
+                Monthly
+              </Label>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleClearAll}
+              className="h-8 text-xs gap-1"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Clear
+            </Button>
           </div>
         </div>
       </CardHeader>
