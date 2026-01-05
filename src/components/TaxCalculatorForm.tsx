@@ -158,7 +158,7 @@ export function TaxCalculatorForm({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <CardTitle>Income Details</CardTitle>
-            <CardDescription>Enter your salary and deductions (2026 Tax Law)</CardDescription>
+            <CardDescription>Enter your salary and deductions </CardDescription>
           </div>
           <div className="flex items-center justify-between gap-2 sm:gap-4">
             <div className="flex items-center gap-2">
