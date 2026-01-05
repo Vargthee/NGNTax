@@ -12,7 +12,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { useCalculationHistory, HistoryEntry } from "@/hooks/useCalculationHistory";
 import { calculateTax, TaxResult } from "@/lib/taxUtils";
 import { TAX_CONFIG } from "@/lib/taxConfig";
-import { Save, History } from "lucide-react";
+import { Save, ChevronDown, ChevronUp } from "lucide-react";
 
 const Index = () => {
   const { theme, toggleTheme } = useTheme();
@@ -61,22 +61,22 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header theme={theme} onToggleTheme={toggleTheme} />
 
-      <main className="flex-1 container px-4 md:px-6 py-8 md:py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Hero Section - minimal, clear */}
-          <div className="mb-10 md:mb-14">
-            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground mb-2">
-              Calculate your Nigerian PAYE tax
-            </h1>
-            <p className="text-muted-foreground text-sm md:text-base">
-              Updated for {TAX_CONFIG.financeActYear}. Enter your income to see your tax breakdown.
+      <main className="flex-1 container px-4 py-6 lg:py-10">
+        <div className="max-w-5xl mx-auto">
+          {/* Hero Section */}
+          <div className="text-center mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
+              Nigerian PAYE Tax Calculator
+            </h2>
+            <p className="text-muted-foreground">
+              Calculate your income tax based on the Nigeria Tax Act {TAX_CONFIG.financeActYear} (Effective {TAX_CONFIG.effectiveDate})
             </p>
           </div>
 
-          {/* Main Content - stacked on mobile, side-by-side on desktop */}
-          <div className="grid gap-8 lg:gap-12 lg:grid-cols-[1fr,380px]">
-            {/* Left Column - Form & Actions */}
-            <div className="space-y-6">
+          {/* Main Content Grid */}
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Left Column - Form */}
+            <div className="space-y-4">
               <TaxCalculatorForm
                 grossSalary={grossSalary}
                 setGrossSalary={setGrossSalary}
@@ -94,72 +94,59 @@ const Index = () => {
                 setIsMonthly={setIsMonthly}
               />
 
-              {/* Action bar */}
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleSaveToHistory}
-                  disabled={grossSalary <= 0}
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  Save
-                </Button>
+              {/* Action Buttons */}
+              <Button
+                onClick={handleSaveToHistory}
+                disabled={grossSalary <= 0}
+                className="w-full"
+              >
+                <Save className="h-4 w-4 mr-2" />
+                Save Calculation
+              </Button>
+
+              {/* History Toggle for Mobile */}
+              <div className="lg:hidden">
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() => setShowHistory(!showHistory)}
-                  className="gap-2 lg:hidden"
+                  className="w-full"
                 >
-                  <History className="h-3.5 w-3.5" />
-                  History ({history.length})
+                  {showHistory ? (
+                    <ChevronUp className="h-4 w-4 mr-2" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4 mr-2" />
+                  )}
+                  {showHistory ? "Hide History" : "Show History"} ({history.length})
                 </Button>
-              </div>
-
-              {/* Mobile History */}
-              {showHistory && (
-                <div className="lg:hidden">
-                  <HistoryPanel
-                    history={history}
-                    onLoadEntry={handleLoadEntry}
-                    onRemoveEntry={removeEntry}
-                    onClearHistory={clearHistory}
-                  />
-                </div>
-              )}
-
-              {/* Charts & Reports - below form on mobile, beside on desktop */}
-              <div className="space-y-6 lg:hidden">
-                <TaxBandChart breakdown={taxResult.bandBreakdown} />
-                <TaxSavingsReport 
-                  result={taxResult} 
-                  grossSalary={grossSalary} 
-                  pensionRate={pensionRate} 
-                />
+                {showHistory && (
+                  <div className="mt-4">
+                    <HistoryPanel
+                      history={history}
+                      onLoadEntry={handleLoadEntry}
+                      onRemoveEntry={removeEntry}
+                      onClearHistory={clearHistory}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
-            {/* Right Column - Summary & Details */}
-            <div className="space-y-6">
+            {/* Right Column - Summary & History */}
+            <div className="space-y-4">
               <TaxSummaryCard result={taxResult} />
-              
-              {/* Desktop Charts */}
-              <div className="hidden lg:block space-y-6">
-                <TaxBandChart breakdown={taxResult.bandBreakdown} />
-                <TaxSavingsReport 
-                  result={taxResult} 
-                  grossSalary={grossSalary} 
-                  pensionRate={pensionRate} 
-                />
-              </div>
-
+              <TaxBandChart breakdown={taxResult.bandBreakdown} />
+              <TaxSavingsReport 
+                result={taxResult} 
+                grossSalary={grossSalary} 
+                pensionRate={pensionRate} 
+              />
               <ExportButtons
                 result={taxResult}
                 grossSalary={grossSalary}
                 pensionRate={pensionRate}
               />
 
-              {/* Desktop History */}
+              {/* History Panel for Desktop */}
               <div className="hidden lg:block">
                 <HistoryPanel
                   history={history}

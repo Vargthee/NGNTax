@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { TaxResult } from "@/lib/taxUtils";
+import { TaxResult, formatNaira } from "@/lib/taxUtils";
 import { TAX_CONFIG } from "@/lib/taxConfig";
 import { Printer, Download } from "lucide-react";
 
@@ -66,23 +66,13 @@ export function ExportButtons({ result, grossSalary, pensionRate }: ExportButton
 
   return (
     <div className="flex gap-2 no-print">
-      <Button 
-        variant="outline" 
-        size="sm" 
-        onClick={handlePrint} 
-        className="flex-1 gap-2 text-muted-foreground"
-      >
-        <Printer className="h-3.5 w-3.5" />
+      <Button variant="outline" onClick={handlePrint} className="flex-1">
+        <Printer className="h-4 w-4 mr-2" />
         Print
       </Button>
-      <Button 
-        variant="outline" 
-        size="sm" 
-        onClick={handleExportCSV} 
-        className="flex-1 gap-2 text-muted-foreground"
-      >
-        <Download className="h-3.5 w-3.5" />
-        Export
+      <Button variant="outline" onClick={handleExportCSV} className="flex-1">
+        <Download className="h-4 w-4 mr-2" />
+        Export CSV
       </Button>
     </div>
   );

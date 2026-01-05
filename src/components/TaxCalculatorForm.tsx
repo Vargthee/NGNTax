@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -6,7 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { TAX_CONFIG } from "@/lib/taxConfig";
 import { formatNaira } from "@/lib/taxUtils";
-
+import { Calculator } from "lucide-react";
 interface TaxCalculatorFormProps {
   grossSalary: number;
   setGrossSalary: (value: number) => void;
@@ -75,6 +76,7 @@ export function TaxCalculatorForm({
   }, [nhisContribution, isMonthly]);
 
   useEffect(() => {
+    // Rent is always annual
     if (annualRent > 0) {
       setRentInput(annualRent.toLocaleString("en-NG"));
     } else {
@@ -115,6 +117,7 @@ export function TaxCalculatorForm({
   const handleRentChange = (value: string) => {
     setRentInput(value);
     const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    // Rent is always entered as annual
     setAnnualRent(numValue);
   };
 
@@ -136,180 +139,194 @@ export function TaxCalculatorForm({
   );
 
   return (
-    <div className="space-y-8">
-      {/* Mode Toggle */}
-      <div className="flex items-center justify-between pb-4 border-b border-border/50">
-        <span className="text-sm text-muted-foreground">Input mode</span>
-        <div className="flex items-center gap-2">
-          <span className={`text-sm ${!isMonthly ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
-            Yearly
-          </span>
-          <Switch
-            id="mode-toggle"
-            checked={isMonthly}
-            onCheckedChange={handleToggleMode}
-          />
-          <span className={`text-sm ${isMonthly ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
-            Monthly
-          </span>
-        </div>
-      </div>
-
-      {/* Gross Salary - Primary input */}
-      <div className="space-y-3">
-        <Label htmlFor="gross-salary" className="text-sm font-medium">
-          Gross {isMonthly ? "monthly" : "annual"} salary
-        </Label>
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
-          <Input
-            id="gross-salary"
-            type="text"
-            placeholder="0"
-            value={salaryInput}
-            onChange={(e) => handleSalaryChange(e.target.value)}
-            className="pl-7 h-11 text-base"
-          />
-        </div>
-        {isMonthly && grossSalary > 0 && (
-          <p className="text-xs text-muted-foreground">
-            = {formatNaira(grossSalary)}/year
-          </p>
-        )}
-      </div>
-
-      {/* Pension Rate */}
-      <div className="space-y-3">
+    <Card>
+      <CardHeader>
         <div className="flex items-center justify-between">
-          <Label htmlFor="pension-rate" className="text-sm font-medium">
-            Pension contribution
+          <div>
+            <CardTitle>Income Details</CardTitle>
+            <CardDescription>Enter your salary and deductions (2026 Tax Law)</CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="mode-toggle" className="text-sm text-muted-foreground">
+              Yearly
+            </Label>
+            <Switch
+              id="mode-toggle"
+              checked={isMonthly}
+              onCheckedChange={handleToggleMode}
+            />
+            <Label htmlFor="mode-toggle" className="text-sm text-muted-foreground">
+              Monthly
+            </Label>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Gross Salary */}
+        <div className="space-y-2">
+          <Label htmlFor="gross-salary">
+            Gross {isMonthly ? "Monthly" : "Annual"} Salary (₦)
           </Label>
-          <span className="text-sm tabular-nums text-primary font-medium">
-            {(pensionRate * 100).toFixed(1)}%
-          </span>
-        </div>
-        <Slider
-          id="pension-rate"
-          min={0}
-          max={20}
-          step={0.5}
-          value={[pensionRate * 100]}
-          onValueChange={([value]) => setPensionRate(value / 100)}
-          className="py-2"
-        />
-        <p className="text-xs text-muted-foreground">
-          Default: {(TAX_CONFIG.contributions.pension.defaultRate * 100)}%
-        </p>
-      </div>
-
-      {/* Deductions Section */}
-      <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Deductions</span>
-          <span className="text-xs text-muted-foreground">Optional</span>
+          <div className="relative">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
+            <Input
+              id="gross-salary"
+              type="text"
+              placeholder="0"
+              value={salaryInput}
+              onChange={(e) => handleSalaryChange(e.target.value)}
+              className="pl-8"
+            />
+          </div>
+          {isMonthly && grossSalary > 0 && (
+            <p className="text-xs text-muted-foreground">
+              Annual: {formatNaira(grossSalary)}
+            </p>
+          )}
         </div>
 
-        {/* NHF */}
+        {/* Pension Rate */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="pension-rate">Pension Contribution</Label>
+            <span className="text-sm font-medium text-primary">
+              {(pensionRate * 100).toFixed(1)}%
+            </span>
+          </div>
+          <Slider
+            id="pension-rate"
+            min={0}
+            max={20}
+            step={0.5}
+            value={[pensionRate * 100]}
+            onValueChange={([value]) => setPensionRate(value / 100)}
+          />
+          <div className="flex justify-between text-xs text-muted-foreground">
+            <span>0%</span>
+            <span className="text-primary">Default: {(TAX_CONFIG.contributions.pension.defaultRate * 100)}%</span>
+            <span>20%</span>
+          </div>
+        </div>
+
+        {/* NHF Contribution */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="nhf" className="text-sm text-muted-foreground">
-              NHF {isMonthly ? "(monthly)" : "(annual)"}
+            <Label htmlFor="nhf">
+              NHF Contribution {isMonthly ? "(Monthly)" : "(Annual)"}
             </Label>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => setNhfContribution(grossSalary * 0.025)}
+              onClick={() => {
+                const nhfAmount = grossSalary * 0.025;
+                setNhfContribution(nhfAmount);
+              }}
               disabled={grossSalary <= 0}
-              className="h-6 px-2 text-xs text-primary hover:text-primary"
+              className="h-7 text-xs gap-1"
             >
-              Auto 2.5%
+              <Calculator className="h-3 w-3" />
+              Auto (2.5%)
             </Button>
           </div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
             <Input
               id="nhf"
               type="text"
               placeholder="0"
               value={nhfInput}
               onChange={(e) => handleNhfChange(e.target.value)}
-              className="pl-7 h-10"
+              className="pl-8"
             />
           </div>
+          {grossSalary > 0 && (
+            <p className="text-xs text-muted-foreground">
+              2.5% of gross = {formatNaira(grossSalary * 0.025)}
+            </p>
+          )}
         </div>
 
-        {/* NHIS */}
+        {/* NHIS Contribution */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="nhis" className="text-sm text-muted-foreground">
-              NHIS {isMonthly ? "(monthly)" : "(annual)"}
+            <Label htmlFor="nhis">
+              NHIS Contribution {isMonthly ? "(Monthly)" : "(Annual)"}
             </Label>
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={() => setNhisContribution(grossSalary * 0.05)}
+              onClick={() => {
+                const nhisAmount = grossSalary * 0.05;
+                setNhisContribution(nhisAmount);
+              }}
               disabled={grossSalary <= 0}
-              className="h-6 px-2 text-xs text-primary hover:text-primary"
+              className="h-7 text-xs gap-1"
             >
-              Auto 5%
+              <Calculator className="h-3 w-3" />
+              Auto (5%)
             </Button>
           </div>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
             <Input
               id="nhis"
               type="text"
               placeholder="0"
               value={nhisInput}
               onChange={(e) => handleNhisChange(e.target.value)}
-              className="pl-7 h-10"
+              className="pl-8"
             />
           </div>
+          {grossSalary > 0 && (
+            <p className="text-xs text-muted-foreground">
+              5% of gross = {formatNaira(grossSalary * 0.05)}
+            </p>
+          )}
         </div>
 
         {/* Annual Rent */}
         <div className="space-y-2">
-          <Label htmlFor="annual-rent" className="text-sm text-muted-foreground">
-            Annual rent paid
+          <Label htmlFor="annual-rent">
+            Annual Rent Paid (₦) - For Rent Relief
           </Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
             <Input
               id="annual-rent"
               type="text"
               placeholder="0"
               value={rentInput}
               onChange={(e) => handleRentChange(e.target.value)}
-              className="pl-7 h-10"
+              className="pl-8"
             />
           </div>
           {annualRent > 0 && (
             <p className="text-xs text-muted-foreground">
-              Relief: {formatNaira(rentReliefPreview)} (20%, max ₦500k)
+              Rent Relief: {formatNaira(rentReliefPreview)} (20% of rent, max ₦500,000)
             </p>
           )}
         </div>
 
         {/* Life Insurance */}
         <div className="space-y-2">
-          <Label htmlFor="insurance" className="text-sm text-muted-foreground">
-            Life insurance {isMonthly ? "(monthly)" : "(annual)"}
+          <Label htmlFor="insurance">
+            Life Insurance Premium {isMonthly ? "(Monthly)" : "(Annual)"} - Optional
           </Label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">₦</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">₦</span>
             <Input
               id="insurance"
               type="text"
               placeholder="0"
               value={insuranceInput}
               onChange={(e) => handleInsuranceChange(e.target.value)}
-              className="pl-7 h-10"
+              className="pl-8"
             />
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

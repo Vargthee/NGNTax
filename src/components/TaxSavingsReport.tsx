@@ -1,4 +1,6 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TaxResult, formatNaira, calculateTax } from "@/lib/taxUtils";
+import { TrendingDown, Lightbulb, PiggyBank, Home, Shield, Heart } from "lucide-react";
 
 interface TaxSavingsReportProps {
   result: TaxResult;
@@ -8,6 +10,7 @@ interface TaxSavingsReportProps {
 
 interface SavingsItem {
   label: string;
+  icon: React.ReactNode;
   deductionAmount: number;
   taxSaved: number;
 }
@@ -36,13 +39,13 @@ export function TaxSavingsReport({ result, grossSalary, pensionRate }: TaxSaving
       pensionRate: excludePension ? 0 : pensionRate,
       nhfContribution: excludeNhf ? 0 : result.nhfContribution,
       nhisContribution: excludeNhis ? 0 : result.nhisContribution,
-      annualRent: excludeRent ? 0 : (result.rentRelief / 0.2),
+      annualRent: excludeRent ? 0 : (result.rentRelief / 0.2), // Reverse calculate rent
       lifeInsurance: excludeInsurance ? 0 : result.lifeInsurance,
     }).annualTax;
     return taxWith;
   };
 
-  // Calculate individual savings
+  // Calculate individual savings by comparing "with all" vs "without this one"
   const taxWithoutPension = calculateSavings(true, false, false, false, false);
   const taxWithoutNhf = calculateSavings(false, true, false, false, false);
   const taxWithoutNhis = calculateSavings(false, false, true, false, false);
@@ -53,7 +56,8 @@ export function TaxSavingsReport({ result, grossSalary, pensionRate }: TaxSaving
 
   if (result.pensionContribution > 0) {
     savingsItems.push({
-      label: "Pension",
+      label: "Pension Contribution",
+      icon: <PiggyBank className="h-4 w-4 text-primary" />,
       deductionAmount: result.pensionContribution,
       taxSaved: taxWithoutPension - result.annualTax,
     });
@@ -61,7 +65,8 @@ export function TaxSavingsReport({ result, grossSalary, pensionRate }: TaxSaving
 
   if (result.nhfContribution > 0) {
     savingsItems.push({
-      label: "NHF",
+      label: "NHF Contribution",
+      icon: <Home className="h-4 w-4 text-blue-500" />,
       deductionAmount: result.nhfContribution,
       taxSaved: taxWithoutNhf - result.annualTax,
     });
@@ -69,7 +74,8 @@ export function TaxSavingsReport({ result, grossSalary, pensionRate }: TaxSaving
 
   if (result.nhisContribution > 0) {
     savingsItems.push({
-      label: "NHIS",
+      label: "NHIS Contribution",
+      icon: <Shield className="h-4 w-4 text-green-500" />,
       deductionAmount: result.nhisContribution,
       taxSaved: taxWithoutNhis - result.annualTax,
     });
@@ -77,7 +83,8 @@ export function TaxSavingsReport({ result, grossSalary, pensionRate }: TaxSaving
 
   if (result.rentRelief > 0) {
     savingsItems.push({
-      label: "Rent relief",
+      label: "Rent Relief",
+      icon: <Home className="h-4 w-4 text-orange-500" />,
       deductionAmount: result.rentRelief,
       taxSaved: taxWithoutRent - result.annualTax,
     });
@@ -85,7 +92,8 @@ export function TaxSavingsReport({ result, grossSalary, pensionRate }: TaxSaving
 
   if (result.lifeInsurance > 0) {
     savingsItems.push({
-      label: "Life insurance",
+      label: "Life Insurance",
+      icon: <Heart className="h-4 w-4 text-red-500" />,
       deductionAmount: result.lifeInsurance,
       taxSaved: taxWithoutInsurance - result.annualTax,
     });
@@ -98,36 +106,66 @@ export function TaxSavingsReport({ result, grossSalary, pensionRate }: TaxSaving
   }
 
   return (
-    <div className="rounded-lg border border-border/50 bg-card p-5 space-y-4">
-      <div className="flex items-baseline justify-between">
-        <h3 className="text-sm font-medium text-muted-foreground">Tax saved</h3>
-        <span className="text-lg font-semibold text-primary tabular-nums">
-          {formatNaira(totalSavings)}
-        </span>
-      </div>
+    <Card className="border-green-500/20 bg-green-500/5">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center gap-2 text-lg">
+          <Lightbulb className="h-5 w-5 text-yellow-500" />
+          Tax Savings Report
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Summary */}
+        <div className="rounded-lg bg-green-500/10 p-4 text-center">
+          <p className="text-sm text-muted-foreground mb-1">Total Tax Saved</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+            {formatNaira(totalSavings)}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            vs. no deductions ({formatNaira(baselineTax)} → {formatNaira(result.annualTax)})
+          </p>
+        </div>
 
-      <div className="space-y-2">
-        {savingsItems.map((item, index) => (
-          <div
-            key={index}
-            className="flex items-center justify-between py-2 border-b border-border/30 last:border-0"
-          >
-            <div>
-              <p className="text-sm">{item.label}</p>
-              <p className="text-xs text-muted-foreground tabular-nums">
-                {formatNaira(item.deductionAmount)} deducted
-              </p>
-            </div>
-            <span className="text-sm font-medium text-primary tabular-nums">
-              −{formatNaira(item.taxSaved)}
-            </span>
+        {/* Breakdown by deduction */}
+        <div className="space-y-3">
+          <p className="text-sm font-medium flex items-center gap-2">
+            <TrendingDown className="h-4 w-4 text-primary" />
+            Savings by Deduction
+          </p>
+          <div className="space-y-2">
+            {savingsItems.map((item, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between p-3 rounded-lg bg-background border"
+              >
+                <div className="flex items-center gap-3">
+                  {item.icon}
+                  <div>
+                    <p className="text-sm font-medium">{item.label}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Deduction: {formatNaira(item.deductionAmount)}
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold text-green-600 dark:text-green-400">
+                    -{formatNaira(item.taxSaved)}
+                  </p>
+                  <p className="text-xs text-muted-foreground">tax saved</p>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
 
-      <p className="text-xs text-muted-foreground leading-relaxed">
-        Your deductions reduce your taxable income, saving you {formatNaira(totalSavings)} in taxes annually.
-      </p>
-    </div>
+        {/* Tip */}
+        <div className="rounded-lg bg-muted/50 p-3 text-xs text-muted-foreground">
+          <p className="font-medium mb-1">💡 Maximize your savings:</p>
+          <p>
+            Ensure you're claiming all eligible deductions including pension, NHF, NHIS, 
+            rent relief (up to ₦500k), and life insurance to reduce your tax burden.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
