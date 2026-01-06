@@ -15,7 +15,7 @@ Unlike generic calculators, this project specifically handles the **abolition of
 * **Offline First:** Calculation logic runs entirely client-side; no internet required after initial load.
 * **Configurable Logic:** Tax rates and bands are decoupled from the UI, allowing for 48-hour updates via a single config file.
 
-## 🛠 Tech Stack
+## 🛠 Tech Stack used
 
 * **Framework:** React 18 (Vite)
 * **Language:** TypeScript (Strict Mode)
