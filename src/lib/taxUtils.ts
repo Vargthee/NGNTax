@@ -147,7 +147,7 @@ export function calculatePAYE(taxableIncome: number): {
 
 /**
  * Main calculation function - calculates complete tax breakdown
- * Based on Nigeria Tax Act 2025 (effective January 1, 2026)
+ * Based on Nigeria Tax Act 2025 (Effective January 1, 2026)
  */
 export function calculateTax(input: TaxInput): TaxResult {
   const { 
