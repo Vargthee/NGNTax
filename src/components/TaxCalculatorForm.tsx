@@ -93,39 +93,53 @@ export function TaxCalculatorForm({
     }
   }, [lifeInsurance, isMonthly]);
 
+  // Max reasonable salary: 1 billion NGN annually
+  const MAX_AMOUNT = 1_000_000_000;
+
+  const parseAndValidateNumber = (value: string, max: number = MAX_AMOUNT): number => {
+    const sanitized = value.replace(/[^0-9.]/g, "");
+    const numValue = parseFloat(sanitized) || 0;
+    
+    // Validate: must be finite, non-negative, and within bounds
+    if (!Number.isFinite(numValue) || numValue < 0) {
+      return 0;
+    }
+    return Math.min(numValue, max);
+  };
+
   const handleSalaryChange = (value: string) => {
     setSalaryInput(value);
-    const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    const numValue = parseAndValidateNumber(value);
     const annualValue = isMonthly ? numValue * 12 : numValue;
-    setGrossSalary(annualValue);
+    setGrossSalary(Math.min(annualValue, MAX_AMOUNT));
   };
 
   const handleNhfChange = (value: string) => {
     setNhfInput(value);
-    const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    const numValue = parseAndValidateNumber(value);
     const annualValue = isMonthly ? numValue * 12 : numValue;
-    setNhfContribution(annualValue);
+    setNhfContribution(Math.min(annualValue, MAX_AMOUNT));
   };
 
   const handleNhisChange = (value: string) => {
     setNhisInput(value);
-    const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    const numValue = parseAndValidateNumber(value);
     const annualValue = isMonthly ? numValue * 12 : numValue;
-    setNhisContribution(annualValue);
+    setNhisContribution(Math.min(annualValue, MAX_AMOUNT));
   };
 
   const handleRentChange = (value: string) => {
     setRentInput(value);
-    const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    const numValue = parseAndValidateNumber(value);
     // Rent is always entered as annual
     setAnnualRent(numValue);
   };
 
   const handleInsuranceChange = (value: string) => {
     setInsuranceInput(value);
-    const numValue = parseFloat(value.replace(/[^0-9.]/g, "")) || 0;
+    const numValue = parseAndValidateNumber(value);
     const annualValue = isMonthly ? numValue * 12 : numValue;
-    setLifeInsurance(annualValue);
+    setLifeInsurance(Math.min(annualValue, MAX_AMOUNT));
   };
 
   const handleToggleMode = (checked: boolean) => {
