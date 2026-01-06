@@ -66,11 +66,21 @@ export function ExportButtons({ result, grossSalary, pensionRate }: ExportButton
 
   return (
     <div className="flex gap-2 no-print">
-      <Button variant="outline" onClick={handlePrint} className="flex-1">
+      <Button
+        variant="outline"
+        onClick={handlePrint}
+        className="flex-1"
+        aria-label="Print tax calculation"
+      >
         <Printer className="h-4 w-4 mr-2" />
         Print
       </Button>
-      <Button variant="outline" onClick={handleExportCSV} className="flex-1">
+      <Button
+        variant="outline"
+        onClick={handleExportCSV}
+        className="flex-1"
+        aria-label="Export tax calculation as CSV file"
+      >
         <Download className="h-4 w-4 mr-2" />
         Export CSV
       </Button>
